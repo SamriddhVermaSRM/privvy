@@ -1,41 +1,42 @@
 .products {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-evenly;
-    gap: 10px;
-    transition: all 1s ease;
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	justify-content: space-evenly;
+	gap: 10px;
+	transition: all 1s ease;
 }
 
-.product{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border: 1px solid #000;
-    width: 200px;
-    
-    transition: all 0.3s ease;
+.product {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+	padding: 10px;
+	border: 1px solid #000;
+	width: 200px;
+
+	transition: all 0.3s ease;
+}
+
+.product img {
+	width: 180px;
+	height: 180px;
 }
 
 .description {
-    display: none;
-    position: absolute;
-    flex-direction: column;
-    gap: 10px;
-    width: 200px;
-    background: rgba(128, 128, 128, 0.221);
-    padding: 10px;
-    border: 1px solid #000;
-    margin: auto auto auto 300px;
+	display: none;
+	position: absolute;
+	flex-direction: column;
+	gap: 10px;
+	width: 200px;
+	background: rgba(128, 128, 128, 0.221);
+	padding: 10px;
+	border: 1px solid #000;
+	margin: auto auto auto 300px;
 }
 
 .product:hover .description {
-    display: flex;
-}
-
-.products:has(.product:hover) .product:not(:hover) {
-    filter: blur(1px);
+	display: flex;
 }

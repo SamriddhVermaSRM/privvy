@@ -1,22 +1,28 @@
+import { useEffect, useState } from "react";
 import "./update.css";
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-
-
-let id = 0;
-function setId(idtoSet) {
-    if (idtoSet != null)
-        id = idtoSet;
-}
 
 function UpdateProducts() {
-    const [productList, setProductList] = useState();
-    const [updateProduct, setUpdateProduct] = useState(false);
-    const [updateOrAdd, setUpdateOrAdd] = useState(false);
 
-    const HandleSubmitUpdateProduct = (e) => {
+    const [products, setProducts] = useState();
+    console.log("refreshed");
+    useEffect(() => {
+        getAllProducts();
+    }, [])
+
+    const [selectedProduct, setSelectedProduct] = useState(-1);
+    const [updateProduct, setUpdateProduct] = useState(false);
+
+    const getAllProducts = () => {
+        fetch("http://localhost:8080/product/all")
+            .then(response => response.json())
+            .then(result => { console.log(result); setProducts(result); })
+            .catch(error => console.log('error', error));
+        console.log("getting all")
+    }
+
+    const HandleSubmitUP = (e) => {
+        console.log("submitting");
         e.preventDefault();
-        setUpdateProduct(false);
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -35,13 +41,13 @@ function UpdateProducts() {
             redirect: 'follow'
         };
 
-        fetch("http://localhost:8080/product/updateProduct/" + id, requestOptions)
+        fetch("http://localhost:8080/product/updateProduct/" + selectedProduct, requestOptions)
             .then(response => response.text())
-            .then(result => { console.log(result); setUpdateProduct(true); })
-            .catch(error => console.log('error', error));
+            .then(result => { console.log(result); getAllProducts(); })
+            .catch(error => console.log('error', error))
     }
 
-    const HandleSubmitAddProduct = (e) => {
+    const HandleSubmitAP = (e) => {
         e.preventDefault();
         setUpdateProduct(false);
         let myHeaders = new Headers();
@@ -64,49 +70,51 @@ function UpdateProducts() {
 
         fetch("http://localhost:8080/product/saveProduct", requestOptions)
             .then(response => response.text())
-            .then(result => { console.log(result); setUpdateProduct(true); })
+            .then(result => { console.log(result); getAllProducts(); })
             .catch(error => console.log('error', error));
     }
 
-    useEffect(() => {
-        let data = null;
-        fetch("http://localhost:8080/product/all", { method: 'GET' })
-            .then(response => response.json())
-            .then(result => { data = result; console.log(result); setProductList(data); })
-            .catch(error => console.log('error', error));
-    }, [updateProduct]);
+
+    const showProducts = (products, selectedProduct, setSelectedProduct) => {
+        return products.map((product) => {
+            let style = {};
+            if (selectedProduct === product.id) {
+                style = {
+                    boxShadow: '0px 0px 10px 0px #000000',
+                };
+            }
+            return (
+                <button style={style} className='product-card' key={product.id} onClick={() => setSelectedProduct(product.id)}>
+                    <img src={product.pathToImg} alt={product.name} />
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+                    <h4>Rs. {product.price}</h4>
+                    <h4>Discount: {product.discount}%</h4>
+                </button>
+            );
+        })
+    }
 
     return (
         <>
-            <div className="product-grid">
-                <div className='product-list'>
-                    {
-                        productList ? productList.map((product) => {
-                            return (
-                                <button onClick={() => setId(product.id)} className='product-card' key={product.id}>
-                                    <img src={product.pathToImg + ''} alt={product.name} />
-                                    <h3>{product.name}</h3>
-                                    <p>{product.description}</p>
-                                    <h4>Rs. {product.price}</h4>
-                                    <h4>Discount: {product.discount}%</h4>
-                                </button>
-                            );
-                        }) : <h1>Loading...</h1>
-                    }
-                </div>
-                {updateOrAdd ? <FormField functionn={HandleSubmitAddProduct} /> : <FormField functionn={HandleSubmitUpdateProduct} />}
-                <button onClick={setUpdateOrAdd(!updateOrAdd)}>
-                    {updateOrAdd ? 'Update Product' : 'Add Product'}
-                </button>
+            <div className='product-list'>
+                {
+                    products ? showProducts(products, selectedProduct, setSelectedProduct) : <h1>Loading...</h1>
+                }
+
             </div>
+            {updateProduct ? <FormField functionn={HandleSubmitAP} uporap={updateProduct} /> : <FormField functionn={HandleSubmitUP} />}
+            <br />
+            <button onClick={() => setUpdateProduct(!updateProduct)}>Add Product</button>
         </>
     );
 }
 
+
 function FormField(props) {
     return (
         <div className='product-update'>
-            <h1>Update Products</h1>
+            <h1>{props.uporap ? "Add Product" : "Update Product"}</h1>
             <form onSubmit={props.functionn}>
                 <label>
                     Product Name:
@@ -128,10 +136,11 @@ function FormField(props) {
                     Product Discount:
                 </label>
                 <input autoComplete="off" autoCorrect="no" type="text" name="discount" />
-                <button type="submit">Update Product</button>
+                <button type="submit">{props.uporap ? "Add Product" : "Update Product"}</button>
             </form>
         </div>
     );
 }
+
 
 export default UpdateProducts;

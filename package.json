@@ -14,7 +14,8 @@
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
     "sass": "^1.69.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@react-buddy/ide-toolbox": "^2.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
